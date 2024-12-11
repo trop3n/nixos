@@ -29,22 +29,7 @@
       devices = [ "nodev" ];
       efiSupport = true;
       configurationLimit = 10;
-      extraEntries = ''
-        menuentry "Fedora Linux 6.11.3" {
-          insmod part_gpt
-          insmod fat
-          insmod ext2
-          insmod btrfs
-
-          # Load both partitions explicitly
-          search --no-floppy --fs-uuid --set=boot b15048fb-1ea4-45b9-afde-d1bc980984ea
-          search --no-floppy --fs-uuid --set=root d4171d1a-e952-4828-8c73-bdd7f19f5262
-
-          # Load kernel directly from the boot partition without using variables
-          linux /vmlinuz-6.11.3-200.fc40.x86_64 root=UUID=d4171d1a-e952-4828-8c73-bdd7f19f5262 ro rootflags=subvol=root
-          initrd /initramfs-6.11.3-200.fc40.x86_64.img
-        }
-      '';
+      # extraEntries = 
     };
   };
 
