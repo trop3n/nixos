@@ -259,7 +259,7 @@
   programs.git = {
     enable = true;
     userName = "trop3n";
-    userEmail = "jasonkimm12@gmail.com";
+    userEmail = "jasondkimm@proton.me";
     delta.options = {
       line-numbers = true;
       side-by-side = true;
