@@ -389,7 +389,7 @@
   # You can update home manager without changing this value. See
   # the home manager release notes for a list of state version 
   # changes in each release.
-  home.stateVersion = "24.05";
+  home.stateVersion = "24.11";
 
   # Let home manage install and manage itself.
   programs.home-manager.enable = true;
