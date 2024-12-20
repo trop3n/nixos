@@ -12,9 +12,9 @@
 
   # Enable the Flakes feature and the accompanying new nix command-line tool
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  
+
   # Set the default editor to vim
-  environment.variables.EDITOR = "vim";
+  environment.variables.EDITOR = "nvim";
 
   fonts.fontDir.enable = true;
 
@@ -29,7 +29,10 @@
       devices = [ "nodev" ];
       efiSupport = true;
       configurationLimit = 10;
-      # extraEntries = 
+      #extraEntries = ''
+      #  menuentry "Arch" {
+      #    set root=(
+      #''
     };
   };
 
@@ -52,6 +55,10 @@
 
   networking.hostName = "nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  # /etc/hosts replacement
+  # networking.extraHosts = ''
+  # ''
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -95,7 +102,14 @@
   # enable OpenGL
   hardware.opengl = {
     enable = true;
+    # driSupport = true;
+    # driSupport32bit = true;
   };
+
+  # steam
+  programs.steam.enable = true;
+  programs.steam.gamescopeSession.enable = true;
+  programs.gamemode.enable = true;
 
   # Load local Nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
@@ -104,7 +118,13 @@
 
     # Modesetting is required
     modesetting.enable = true;
-    
+
+    # prime activation
+    # prime = {
+    #   sync.enable = true;
+    #   nvidiaBusId = "PCI:1:0:0";
+    # };
+
     # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
     # Enable this if your have graphical corruption issues or application crashes after
     # waking up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead
@@ -130,7 +150,7 @@
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
-  
+
   # Enable CUPS to print documents.
   services.printing.enable = false;
 
@@ -175,12 +195,9 @@
     "openssl-1.1.1w"
   ];
 
-  # programs.fish.enable = true;
-
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -211,6 +228,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.05"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
 
 }

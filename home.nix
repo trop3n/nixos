@@ -1,12 +1,26 @@
-{ config, pkgs, nix-index-database, username, ... }: 
+{ config, pkgs, lib, nix-index-database, username, inputs, ... }:
 
 {
+  # imports = [
+  # nixvim.homeManagerModules.nixvim
+  # nixvim.nixosModules.nixvim
+  # ];
+
+  #colorScheme = nix-colors.colorSchemes.tokyo-night-storm;
   # TODO please change the username & home directory to your own
+
   home = {
     username = "jason";
     homeDirectory = "/home/jason";
-    sessionVariables.EDITOR = "nvim";
-    # sessionVariables.SHELL = "/etc/profiles/per-user/jason/bin/fish";
+    sessionVariables = {
+      EDITOR = "nvim";
+      VISUAL = "nvim";
+      TERMINAL = "alacritty";
+      LANG = "en_US.UTF-8";
+      FZF_CTRL_T_OPTS = "--preview 'bat -n --color=always --theme='Catppuccin Mocha' --line-range :500 {}'";
+      FZF_ALT_C_OPTS = "--preview 'eza --tree --color=always {} | head -200'";
+    };
+
   };
 
   # link the configuration file in current directory to the specified location in home directory
@@ -39,6 +53,7 @@
     # feel free to add your own or remove some of them
 
     neofetch
+    fastfetch
     nnn # terminal file manager
     git
     git-crypt
@@ -52,17 +67,29 @@
     tor
     chromium
 
+    # python + packages
+    python3Full
+    python312Packages.scrapy
+    poetry
+
     # core languages
     rustup
     rustc
-    python3Full
     ruby
     crystal_1_9
-    elixir_1_15
     erlang
-    nodejs_22
+    nodejs_23
     go
-    jdk22
+    elixir_1_16
+    dart
+    gleam
+    scala
+    jdk
+    lua
+
+    # dev environments
+    android-studio
+    android-studio-tools
 
     # treesitter
     tree-sitter
@@ -70,9 +97,11 @@
     # text-editors
     vim
     neovim
-    lunarvim
     vscode
-
+    zed-editor
+    sublime4
+    helix
+  
     # shells
     zsh
     fish
@@ -88,7 +117,7 @@
     nodePackages.prettier
     shellcheck
     shfmt
-    statix 
+    statix
 
     # security tools
     burpsuite
@@ -109,13 +138,16 @@
     # containers
     docker_27
     devbox
+    qemu
+    virtualbox
+    virt-manager
 
     # rust-stuff
     cargo-cache
     cargo-expand
 
     # terminals
-    hyper
+    # hyper
     alacritty
     kitty
     warp-terminal
@@ -139,7 +171,11 @@
     oh-my-posh
     oh-my-git
     oh-my-fish
-    
+    karla
+    julia-mono
+    fantasque-sans-mono
+    mononoki
+
     # archives
     zip
     xz
@@ -177,6 +213,7 @@
     zoxide
     lsd
     lazygit
+    lf
 
     # networking tools
     mtr # network diagnostic tool
@@ -208,9 +245,7 @@
     blender
     cava
 
-    
     # nix related
-    #
     # it provides the command 'nom' works just like 'nix'
     # with more details log output
     nix-output-monitor
@@ -218,7 +253,7 @@
     # productivity
     hugo # static site generator
     glow # markdown previewer in terminal
-    obsidian 
+    obsidian
 
 
     btop # replacement for htop/nmon
@@ -237,23 +272,82 @@
     pciutils # lspci
     usbutils # lsusb
     coreutils
+    ags
+
+    # gaming
+    mangohud
+    protonup
+    discord
+    lutris
+
+    #gamedev
+    unityhub
+    pixelorama
+    godot_4
+    krita
   ];
+
+  home.sessionVariables = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATHS =
+      "\${HOME}/.steam/root/compatibilitytools.d";
+  };
 
   # programs.nix-index-enable = true;
   # programs.nix-index-database.comma.enable = true;
   # programs.nix-index.enableFishIntegration = true;
 
-  # fzf.enable = true;
-  # fzf.enableFishIntegration = true;
-  # lsd.enable = true;
-  # lsd.enableAliases = true;
-  # zoxide.enable = true;
-  # zoxide.enableFishIntegration = true;
-  # zoxide.options = ["--cmd cd"];
-  # broot.enable = true;
-  # broot.enableFishIntegration = true;
-  # direnv.enable = true;
-  # direnv.nix-direnv.enable = true;
+  programs.fzf.enable = true;
+  programs.fzf.enableFishIntegration = true;
+  programs.lsd.enable = true;
+  # programs.lsd.enableAliases = true;
+  programs.zoxide.enable = true;
+  programs.zoxide.enableFishIntegration = true;
+  programs.zoxide.options = ["--cmd cd"];
+  programs.broot.enable = true;
+  programs.broot.enableFishIntegration = true;
+  programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
+
+  # nixvim
+  # programs.nixvim.enable = true;
+
+  # neovim
+  /* programs.neovim = {
+    enable = true;
+    package = pkgs.neovim-nightly;
+    vimAlias = true;
+    vimdiffAlias = true;
+    withNodeJs = true;
+    plugins = with pkgs.vimPlugins; [
+      lazy-nvim
+    ];
+    extraLuaConfig = ''
+      vim.g.mapleader = " "
+      require("lazy").setup({
+        performance = {
+          reset_packpath = false,
+          rtp = {
+              reset = false,
+            }
+          spec = {
+            { import = "plugins" },
+          },
+          },
+        dev = {
+          path = "${pkgs.vimUtils.packDir config.home-manager.users.USERNAME.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start",
+          patterns = {""},
+        },
+        install = {
+          missing = false,
+        },
+      })
+    '';
+  };
+
+  xdg.configFile."nvim/lua" = {
+    recursive = true;
+    source = ./lua;
+  }; */
 
   # basic configuration of git
   programs.git = {
@@ -284,6 +378,30 @@
     };
   };
 
+  # helix
+  programs.helix = {
+    enable = true;
+    settings = {
+      theme = "monokai_pro_spectrum";
+      editor.cursor-shape = {
+        normal = "block";
+        insert = "bar";
+        select = "underline";
+      };
+    };
+    languages.language = [{
+      name = "nix";
+      auto-format = true;
+      formatter.command = lib.getExe pkgs.nixfmt-rfc-style;
+    }];
+    themes = {
+      monokai_pro_spectrum = {
+        "inherits" = "monokai_pro";
+        "ui.background" = { };
+      };
+    };
+  };
+
   # fish
   programs.fish = {
     enable = true;
@@ -300,21 +418,87 @@
 
       set -U fish_greeting
     '';
-  };
+    functions = {
+        refresh = "source $HOME/.config/fish/config.fish";
+        take = ''mkdir -p -- "$1" && cd -- "$1"'';
+        ttake = "cd $(mktemp -d)";
+        show_path = "echo $PATH | tr ' ' '\n'";
+        posix-source = ''
+          for i in (cat $argv)
+            set arr (echo $i |tr = \n)
+            set -gx $arr[1] $arr[2]
+          end
+        '';
+    };
+    shellAbbrs =
+      {
+        gc = "nix-collect-garbage --delete-old";
+      }
+      # navigation shortcuts
+      // {
+        ".." = "cd ..";
+        "..." = "cd ../../";
+        "...." = "cd ../../../";
+        "....." = "cd ../../../../";
+      }
+      # git shortcuts
+      // {
+        ga = "git add'";
+        gc = "git commit -m";
+        gcl = "git clone --depth 1'";
+        gi = "git init";
+        gp = "git push origin master";
+      };
 
+    shellAliases = {
+      lvim = "nvim";
+      k = "kubectl";
+      urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
+      urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
+      ls = "exa --icons";
+      l = "exa --icons -lh";
+      ll = "exa --icons -lah";
+      la = "exa --icons -A";
+      lm = "exa --icons -m";
+      lr = "exa --icons -R";
+      lg = "exa --icons -l --group-directories-first";
+      gcl = "git clone --depth 1";
+      gi = "git init";
+      ga = "git add";
+      gc = "git commit -m";
+      gp = "git push origin master";
+    };
+    plugins = [
+      {
+        inherit (pkgs.fishPlugins.autopair) src;
+        name = "autopair";
+      }
+      {
+        inherit (pkgs.fishPlugins.done) src;
+        name = "done";
+      }
+      {
+        inherit (pkgs.fishPlugins.sponge) src;
+        name = "sponge";
+      }
+    ];
+  };
+  
   # zellij
   programs.zellij = {
     enable = true;
     settings = {
       default_layout = "compact";
       default_shell = "fish";
-      theme = "gruvbox-dark";
+      theme = "tokyo-night-storm";
     };
   };
 
   # starship
   programs.starship = {
     enable = true;
+    enableZshIntegration = false;
+    enableBashIntegration = false;
     # custom settings
     settings = {
       add_newline = false;
@@ -322,9 +506,14 @@
       gcloud.disabled = true;
       line_break.disabled = true;
       git_branch.style = "242";
+      directory.style = "blue";
       directory.truncate_to_repo = false;
       directory.truncation_length = 8;
-    #  hostname.style = "bold green";
+      hostname.style = "bold cyan";
+      username = {
+        style_user = "bright-green bold";
+        style_root = "bright-blue bold";
+      };
     };
   };
 
@@ -334,25 +523,25 @@
     # custom settings
     settings = {
       env.TERM = "xterm-256color";
-      shell = {
+      terminal.shell = {
         program = "fish";
         args = [ "--login" ];
       };
       font = {
         normal = {
-          family = "Hack Nerd Font Mono";
+          family = "Fantasque Sans Mono";
           style = "Regular";
         };
         bold = {
-          family = "Hack Nerd Font Mono";
-          style = "Bold"; 
+          family = "Fantasque Sans Mono";
+          style = "Bold";
         };
         italic = {
-          family = "Hack Nerd Font Mono";
+          family = "Fantasque Sans Mono";
           style = "Italic";
         };
         bold_italic = {
-          family = "Hack Nerd Font Mono";
+          family = "Fantasque Sans Mono";
           style = "Bold Italic";
         };
         size = 10;
@@ -360,16 +549,63 @@
       };
       scrolling.multiplier = 5;
       selection.save_to_clipboard = true;
+      # decorations.none = true;
+      window.opacity = 0.7;
+      window.blur = true;
     };
+  };
+ 
+  programs.tmux = {
+    enable = true;
+    plugins = with pkgs; [
+      tmuxPlugins.better-mouse-mode
+    ];
+    extraConfig = ''
+      # https://old.reddit.com/r/tmux/comments/mesrci/tmux_2_doesnt_seem_to_use_256_colors/
+      set -g default-terminal "xterm-256color"
+      set -ga terminal-overrides ",*256col*:Tc"
+      set -ga terminal-overrides '*:Ss=\E[%p1%d q:Se=\E[ q'
+      set-environment -g COLORTERM "truecolor"
+
+      # Mouse works as expected
+      set-option -g mouse on
+      # easy-to-remember split pane commands
+      bind | split-window -h -c "#{pane_current_path}"
+      bind - split-window -v -c "#{pane_current_path}"
+      bind c new-window -c "#{pane_current_path}"
+    '';
   };
 
   programs.kitty = {
     enable = true;
   };
 
+  programs.cava = {
+    enable = true;
+    settings = {
+      general.framerate = 60;
+      general.bars = 256;
+      general.bar_width = 1;
+      general.bar_spacing = 1;
+      color = {
+        gradient = 1;
+        gradient_count = 8;
+        gradient_color_1 = "'#ffffff'";
+        gradient_color_2 = "'#d95468'";
+        gradient_color_3 = "'#ebbf83'";
+        gradient_color_4 = "'#8bd49c'";
+        gradient_color_5 = "'#539afc'";
+        gradient_color_6 = "'#70e1e8'";
+        gradient_color_7 = "'#b62d65'";
+        gradient_color_8 = "'#b62d65'";
+      };
+    };
+  };
+
   programs.bash = {
     enable = true;
     enableCompletion = true;
+  # environment.pathsToLink = [ "/share/bash-completion" ];
     # TODO add your custom bashrc here
     bashrcExtra = ''
       export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
@@ -379,15 +615,66 @@
       k = "kubectl";
       urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
       urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
+      ls = "exa --icons";
+      l = "exa --icons -lh";
+      ll = "exa --icons -lah";
+      la = "exa --icons -A";
+      lm = "exa --icons -m";
+      lr = "exa --icons -R";
+      lg = "exa --icons -l --group-directories-first";
+      gcl = "git clone --depth 1";
+      gi = "git init";
+      ga = "git add";
+      gc = "git commit -m";
+      gp = "git push origin master";
     };
   };
 
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    # environment.pathsToLink = [ "/share/zsh" ];
+    antidote.enable = true;
+    antidote.plugins = [
+      "zsh-users/zsh-autosuggestions"
+    ];
+    autosuggestion.highlight = true;
+    autosuggestion.strategy = [
+      "history"
+    ];
+    shellAliases = {
+      k = "kubectl";
+      urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
+      urlencode = "python3 -c 'import sys, urllib.parse as ul; print(ul.quote_plus(sys.stdin.read()))'";
+      ls = "exa --icons";
+      l = "exa --icons -lh";
+      ll = "exa --icons -lah";
+      la = "exa --icons -A";
+      lm = "exa --icons -m";
+      lr = "exa --icons -R";
+      lg = "exa --icons -l --group-directories-first";
+      gcl = "git clone --depth 1";
+      gi = "git init";
+      ga = "git add";
+      gc = "git commit -m";
+      gp = "git push origin master";
+    };
+  };
+
+  programs.oh-my-posh = {
+    enable = true;
+    enableBashIntegration = true;
+    enableFishIntegration = false;
+    enableZshIntegration = true;
+    useTheme = "emodipt-extend";
+  };
+  
   # This value determines the home manager release that your configuration
   # is compatible with. This helps avoid breakage When a new home manager
   # release introduces backwards incompatible changes.
-  # 
+  #
   # You can update home manager without changing this value. See
-  # the home manager release notes for a list of state version 
+  # the home manager release notes for a list of state version
   # changes in each release.
   home.stateVersion = "24.11";
 
