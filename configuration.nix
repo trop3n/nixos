@@ -18,23 +18,51 @@
 
   fonts.fontDir.enable = true;
 
-  # Bootloader.
-  # boot.loader.systemd-boot.enable = true;
-  # boot.loader.efi.canTouchEfiVariables = true;
+  # systemd bootloader.
+  # boot.loader = {
+  #   systemd-boot = {
+  #     enable = true;
+  #     configurationLimit = 10;
+  #     editor = false;
+  #     consoleMode = "max";
+  #     extraEntries = {
+  #       "arch.conf" = ''
+  #         title Arch Linux
+  #         linux /vmlinuz-linux
+  #         initrd /intel-ucode.img
+  #         initrd /initramfs-linux.img
+  #         options root=UUID=59f9c4f1-16a0-4877-8c6b-23e2e504d4e3 rw
+  #        '';
+  #       "windows.conf" = ''
+  #         title Windows 11
+  #         efi /EFI/Microsoft/Boot/bootmgfw.efi
+  #        '';
+  #     };
+  #   };
+  #   efi.canTouchEfiVariables = true;
+  #   grub.enable = false;
+  #   timeout = 20;
+  # };
+
+  # GRUB
   boot.loader = {
   efi.canTouchEfiVariables = true;
     grub = {
       enable = true;
       useOSProber = true;
-      devices = [ "nodev" ];
+      device = "nodev";
       efiSupport = true;
       configurationLimit = 10;
-      #extraEntries = ''
-      #  menuentry "Arch" {
-      #    set root=(
-      #''
+      extraEntries = ''
+        menuentry "Arch Linux" {
+          set root=(hd3,gpt1)
+          linux /vmlinuz-linux root=UUID=59f9c4f1-16a0-4877-8c6b-23e2e504d4e3 rw
+          initrd /initramfs-linux.img
+        }
+      '';
     };
   };
+
 
   # Perform garbage collection weelky to maintain low disk usage
   nix.gc = {
@@ -100,7 +128,7 @@
   };
 
   # enable OpenGL
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
     # driSupport = true;
     # driSupport32bit = true;
@@ -180,6 +208,8 @@
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       kdePackages.kate
+      wireshark
+      efibootmgr
     #  thunderbird
     ];
 

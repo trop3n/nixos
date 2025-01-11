@@ -84,7 +84,6 @@
     dart
     gleam
     scala
-    jdk
     lua
 
     # dev environments
@@ -134,6 +133,7 @@
     rizin
     powersploit
     maltego
+    sqlmap
 
     # containers
     docker_27
@@ -141,6 +141,9 @@
     qemu
     virtualbox
     virt-manager
+    libvirt
+    virt-viewer
+    bridge-utils
 
     # rust-stuff
     cargo-cache
@@ -151,6 +154,7 @@
     alacritty
     kitty
     warp-terminal
+    ghostty
 
     # fonts & prompts
     (pkgs.nerdfonts.override {

@@ -8,17 +8,18 @@
     # nix colors
     nix-colors.url = "github:misterio77/nix-colors";
     
+    # nixvim
     nixvim.url = "github:dc-tec/nixvim";
 
     # stylix
-    # stylix.url = "github:danth/stylix/release-24.05";
+    stylix.url = "github:danth/stylix/release-24.05";
 
     # nix index database
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
     # NUR
-    # nur.url = "github:nix-community/NUR";
+    nur.url = "github:nix-community/NUR";
 
     # home-manager, used for managing user configuration
     home-manager = {
