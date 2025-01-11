@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, nixvim, home-manager, ... }:
 
 {
   imports =
@@ -59,7 +59,7 @@
           linux /vmlinuz-linux root=UUID=59f9c4f1-16a0-4877-8c6b-23e2e504d4e3 rw
           initrd /initramfs-linux.img
         }
-      '';
+     '';
     };
   };
 
@@ -69,6 +69,12 @@
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 1w";
+  };
+
+  # libvirt
+  virtualisation.libvirtd = {
+    enable = true;
+    package = pkgs.qemu_kvm; # Use the QEMU package with KVM support
   };
 
   # Optimize Storage
@@ -183,7 +189,7 @@
   services.printing.enable = false;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -210,6 +216,8 @@
       kdePackages.kate
       wireshark
       efibootmgr
+      os-prober
+      vscodium
     #  thunderbird
     ];
 
