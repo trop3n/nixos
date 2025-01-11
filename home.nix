@@ -1,10 +1,16 @@
 { config, pkgs, lib, nix-index-database, username, inputs, ... }:
 
 {
-  # imports = [
-  # nixvim.homeManagerModules.nixvim
-  # nixvim.nixosModules.nixvim
-  # ];
+  imports = [
+    inputs.nixvim.homeManagerModules.nixvim
+  ];
+
+  # Enable nixvim
+  programs.nixvim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+  };
 
   #colorScheme = nix-colors.colorSchemes.tokyo-night-storm;
   # TODO please change the username & home directory to your own
@@ -80,7 +86,9 @@
     erlang
     nodejs_23
     go
-    elixir_1_16
+    elixir_1_18
+    # beam.packages.erlangR26.erlang
+    # beam.packages.erlangR26.elixir
     dart
     gleam
     scala
@@ -95,7 +103,6 @@
 
     # text-editors
     vim
-    neovim
     vscode
     zed-editor
     sublime4
@@ -156,29 +163,24 @@
     warp-terminal
     ghostty
 
-    # fonts & prompts
-    (pkgs.nerdfonts.override {
-      fonts = [
-        "IBMPlexMono"
-        "Iosevka"
-        "IosevkaTerm"
-        "FiraCode"
-        "0xProto"
-        "Hack"
-        "JetBrainsMono"
-        "Meslo"
-        "Ubuntu"
-        "ZedMono"
-      ];
-    })
-    oh-my-zsh
-    oh-my-posh
-    oh-my-git
-    oh-my-fish
+    # fonts
+    nerd-fonts._0xproto
+    nerd-fonts.hack
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.ubuntu
+    nerd-fonts.droid-sans-mono
+    nerd-fonts.iosevka
+    nerd-fonts.blex-mono
     karla
     julia-mono
     fantasque-sans-mono
     mononoki
+
+    # prompts
+    oh-my-zsh
+    oh-my-posh
+    oh-my-git
+    oh-my-fish
 
     # archives
     zip
