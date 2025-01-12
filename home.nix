@@ -3,6 +3,7 @@
 {
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
+#     inputs.stylix.homeManagerModules.stylix
   ];
 
   # Enable nixvim
@@ -12,8 +13,14 @@
     vimAlias = true;
   };
 
-  #colorScheme = nix-colors.colorSchemes.tokyo-night-storm;
-  # TODO please change the username & home directory to your own
+  # stylix home-manager
+#   stylix = {
+#     iconTheme = {
+#       enable = true;
+#       name = "Adwaita";
+#       package = pkgs.adwaita-icon-theme;
+#     };
+#   };
 
   home = {
     username = "jason";
@@ -72,6 +79,7 @@
     brave
     tor
     chromium
+    google-chrome
 
     # python + packages
     python3Full
@@ -107,6 +115,7 @@
     zed-editor
     sublime4
     helix
+    lunarvim
   
     # shells
     zsh
@@ -170,11 +179,45 @@
     nerd-fonts.ubuntu
     nerd-fonts.droid-sans-mono
     nerd-fonts.iosevka
+    nerd-fonts.iosevka-term
+    nerd-fonts.iosevka-term-slab
     nerd-fonts.blex-mono
+    nerd-fonts.inconsolata
+    nerd-fonts.agave
+    nerd-fonts.anonymice
+    nerd-fonts.arimo
+    nerd-fonts.aurulent-sans-mono
+    nerd-fonts.caskaydia-cove
+    nerd-fonts.caskaydia-mono
+    nerd-fonts.code-new-roman
+    nerd-fonts.cousine
+    nerd-fonts.envy-code-r
+    nerd-fonts.geist-mono
+    nerd-fonts.fira-mono
+    nerd-fonts.go-mono
+    nerd-fonts.hasklug
+    nerd-fonts.lilex
+    nerd-fonts.meslo-lg
+    nerd-fonts.monaspace
+    nerd-fonts.monofur
+    nerd-fonts.noto
+    nerd-fonts.mplus
+    nerd-fonts.overpass
+    nerd-fonts.profont
+    nerd-fonts.recursive-mono
+    nerd-fonts.roboto-mono
+    nerd-fonts.sauce-code-pro
+    nerd-fonts.terminess-ttf
+    nerd-fonts.zed-mono
+    nerd-fonts.space-mono
+    nerd-fonts.bitstream-vera-sans-mono
     karla
     julia-mono
     fantasque-sans-mono
     mononoki
+    udev-gothic-nf
+    hackgen-nf-font
+    newcomputermodern
 
     # prompts
     oh-my-zsh
@@ -314,47 +357,6 @@
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
-  # nixvim
-  # programs.nixvim.enable = true;
-
-  # neovim
-  /* programs.neovim = {
-    enable = true;
-    package = pkgs.neovim-nightly;
-    vimAlias = true;
-    vimdiffAlias = true;
-    withNodeJs = true;
-    plugins = with pkgs.vimPlugins; [
-      lazy-nvim
-    ];
-    extraLuaConfig = ''
-      vim.g.mapleader = " "
-      require("lazy").setup({
-        performance = {
-          reset_packpath = false,
-          rtp = {
-              reset = false,
-            }
-          spec = {
-            { import = "plugins" },
-          },
-          },
-        dev = {
-          path = "${pkgs.vimUtils.packDir config.home-manager.users.USERNAME.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start",
-          patterns = {""},
-        },
-        install = {
-          missing = false,
-        },
-      })
-    '';
-  };
-
-  xdg.configFile."nvim/lua" = {
-    recursive = true;
-    source = ./lua;
-  }; */
-
   # basic configuration of git
   programs.git = {
     enable = true;
@@ -366,6 +368,7 @@
       navigate = true;
     };
     extraConfig = {
+      init.defaultBranch = "main";
     #  url = {
     #    "https://oauth2:${secrets.github_token}"@github.com" = {
     #      insteadOf = "https://github.com"
@@ -388,7 +391,7 @@
   programs.helix = {
     enable = true;
     settings = {
-      theme = "monokai_pro_spectrum";
+      theme = lib.mkForce "monokai_pro_spectrum";
       editor.cursor-shape = {
         normal = "block";
         insert = "bar";
@@ -496,7 +499,7 @@
     settings = {
       default_layout = "compact";
       default_shell = "fish";
-      theme = "tokyo-night-storm";
+      # theme = "tokyo-night-storm";
     };
   };
 
@@ -550,13 +553,13 @@
           family = "Fantasque Sans Mono";
           style = "Bold Italic";
         };
-        size = 10;
+        size = lib.mkForce 10;
         # draw_bold_text_with_bright_colors = true;
       };
       scrolling.multiplier = 5;
       selection.save_to_clipboard = true;
       # decorations.none = true;
-      window.opacity = 0.7;
+      window.opacity = lib.mkForce 0.7;
       window.blur = true;
     };
   };
