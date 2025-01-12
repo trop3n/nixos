@@ -14,9 +14,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
   };
 
-  outputs = inputs@{ nixpkgs, home-manager, nix-index-database, nix-colors, stylix, nvf, nur, nixvim, ... }: {
+  outputs = { nixpkgs, home-manager, nix-index-database, nix-colors, stylix, nvf, nur, nixvim, ... }@inputs: {
 
     # packages."x86_64-linux".default =
     #   (nvf.lib.neovimConfiguration {
@@ -33,7 +34,7 @@
           ./configuration.nix
           nix-index-database.nixosModules.nix-index
           home-manager.nixosModules.home-manager
-          nvf.nixosModules.default
+          inputs.stylix.nixosModules.stylix
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;

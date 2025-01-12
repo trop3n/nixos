@@ -13,6 +13,63 @@
   # Enable the Flakes feature and the accompanying new nix command-line tool
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+    # Stylix configuration
+  stylix = {
+    enable = true;
+    image = ./wallhaven-jx2rxw.jpg;
+    base16Scheme = {
+      base00 = "#1d252c";  # Background
+      base01 = "#2a343d";  # Lighter Background
+      base02 = "#3a4654";  # Selection Background
+      base03 = "#54687a";  # Comments, Invisibles
+      base04 = "#6a7a8a";  # Dark Foreground
+      base05 = "#a0a8b6";  # Default Foreground
+      base06 = "#c0c8d6";  # Light Foreground
+      base07 = "#e0e8f6";  # Light Background
+      base08 = "#ff5874";  # Red
+      base09 = "#ff966c";  # Orange
+      base0A = "#ffcc99";  # Yellow
+      base0B = "#a8d1a5";  # Green
+      base0C = "#9cd1be";  # Cyan
+      base0D = "#82aaff";  # Blue
+      base0E = "#c792ea";  # Purple
+      base0F = "#d6deeb";  # Light Foreground (Alternative)
+    };
+    homeManagerIntegration.followSystem = true;
+    opacity = {
+      applications = 0.7;
+      terminal = 0.7;
+    };
+    polarity = "dark";
+    fonts = {
+      serif = {
+        package = pkgs.karla;
+        name = "Karla";
+      };
+      sansSerif = {
+        package = pkgs.karla;
+        name = "Karla";
+      };
+      monospace = {
+        package = pkgs.fantasque-sans-mono;
+        name = "Fantasque Sans Mono";
+      };
+    };
+    cursor.package = pkgs.bibata-cursors;
+    cursor.name = "Bibata-Modern-Ice";
+    cursor.size = 24;
+  };
+  stylix.targets = {
+    gtk.enable = true;
+    # qt.enable = true;
+    chromium.enable = true;
+    fish.enable = true;
+    grub.enable = true;
+    nixos-icons.enable = true;
+    nixvim.enable = true;
+    # nixvim.plugin = "base16-nvim";
+  };
+
   # Set the default editor to vim
   environment.variables.EDITOR = "nvim";
 
@@ -236,6 +293,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    adwaita-icon-theme
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
