@@ -120,6 +120,10 @@
     # shells
     zsh
     fish
+    bash-completion
+    bash-preexec
+    zsh-completions
+    zsh-autosuggestions
 
     # language servers
     nodePackages.vscode-langservers-extracted # html, css, json, eslint
@@ -150,6 +154,16 @@
     powersploit
     maltego
     sqlmap
+    postman
+    bloodhound
+    thc-hydra
+    # medusa
+    radare2
+    gobuster
+    nikto
+    wfuzz
+    dirb
+    responder
 
     # containers
     docker_27
@@ -160,6 +174,7 @@
     libvirt
     virt-viewer
     bridge-utils
+    kubectl
 
     # rust-stuff
     cargo-cache
@@ -614,8 +629,7 @@
   programs.bash = {
     enable = true;
     enableCompletion = true;
-  # environment.pathsToLink = [ "/share/bash-completion" ];
-    # TODO add your custom bashrc here
+
     bashrcExtra = ''
       export PATH="$PATH:$HOME/bin:$HOME/.local/bin:$HOME/go/bin"
     '';
@@ -642,15 +656,47 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
-    # environment.pathsToLink = [ "/share/zsh" ];
-    antidote.enable = true;
-    antidote.plugins = [
-      "zsh-users/zsh-autosuggestions"
+    plugins = [
+      {
+        name = "zsh-autosuggestions";
+        src = pkgs.fetchFromGitHub {
+          owner = "zsh-users";
+          repo = "zsh-autosuggestions";
+          rev = "v0.7.1";
+          sha256 = "0z6i9wjjklb4lvr7zjhbphibsyx51psv50gm07mbb0kj9058j6kc";
+        };
+      }
+      {
+        name = "geometry";
+        src = pkgs.fetchFromGitHub {
+          owner = "geometry-zsh";
+          repo = "geometry";
+          rev = "master";
+          sha256 = "02knbmcf8invkvz0g42xk3dlk4lqffk43bsmi8z4n01508jqkd8g";
+        };
+      }
     ];
-    autosuggestion.highlight = true;
-    autosuggestion.strategy = [
-      "history"
-    ];
+    oh-my-zsh = {
+      enable = true;
+      theme = "geometry";
+      plugins = [
+        "docker"
+        "kubectl"
+        "git"
+        "fzf"
+        "flutter"
+        "direnv"
+        "pip"
+        "poetry"
+        "python"
+        "rust"
+        "poetry-env"
+        "starship"
+        "sudo"
+        "zoxide"
+        "nmap"
+      ];
+    };
     shellAliases = {
       k = "kubectl";
       urldecode = "python3 -c 'import sys, urllib.parse as ul; print(ul.unquote_plus(sys.stdin.read()))'";
@@ -674,7 +720,7 @@
     enable = true;
     enableBashIntegration = true;
     enableFishIntegration = false;
-    enableZshIntegration = true;
+    enableZshIntegration = false;
     useTheme = "emodipt-extend";
   };
   
