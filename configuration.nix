@@ -264,6 +264,23 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  # postgresql
+#   services.postgresql = {
+#     enable = true;
+#     ensureDatabases = [ "msf" ];
+#     ensureUsers = [
+#       {
+#         name = "msf";
+#         ensurePermissions = {
+#           "DATABASE msf" = "ALL PRIVILEGES";
+#         };
+#       }
+#     ];
+#   };
+#   systemd.services.postgresql = {
+#     wantedBy = [ "multi-user.target" ];
+#   };
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.jason = {
     isNormalUser = true;
