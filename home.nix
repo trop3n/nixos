@@ -124,6 +124,8 @@
     bash-preexec
     zsh-completions
     zsh-autosuggestions
+    zsh-syntax-highlighting
+    zsh-autocomplete
 
     # language servers
     nodePackages.vscode-langservers-extracted # html, css, json, eslint
@@ -313,6 +315,7 @@
     # it provides the command 'nom' works just like 'nix'
     # with more details log output
     nix-output-monitor
+    nix-prefetch-github
 
     # productivity
     hugo # static site generator
@@ -578,7 +581,30 @@
       window.blur = true;
     };
   };
- 
+
+  programs.ghostty = {
+    enable = true;
+  };
+  home.file.".config/ghostty/config".text = ''
+    initial-command = zsh
+    font-family = Lilex Nerd Font Mono
+    font-size = 10
+    theme = SoftServer
+
+    mouse-hide-while-typing = true
+    mouse-scroll-multiplier = 2
+
+    window-padding-balance = true
+    window-save-state = always
+    window-colorspace = display-p3
+    window-decoration = true
+    background-opacity = 0.9
+    background = 1d252c
+
+    cursor-style = block
+    keybind = ctrl+w=toggle_window_decorations
+    '';
+
   programs.tmux = {
     enable = true;
     plugins = with pkgs; [
@@ -656,7 +682,17 @@
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+    syntaxHighlighting.enable = true;
     plugins = [
+        {
+          name = "zsh-async";
+          src = pkgs.fetchFromGitHub {
+            owner = "mafredri";
+            repo = "zsh-async";
+            rev = "a66d76f8404bd9e7a26037640e6c892cf5871ff4";
+            sha256 = "sha256-Js/9vGGAEqcPmQSsumzLfkfwljaFWHJ9sMWOgWDi0NI=";
+          };
+        }
       {
         name = "zsh-autosuggestions";
         src = pkgs.fetchFromGitHub {
@@ -666,35 +702,35 @@
           sha256 = "0z6i9wjjklb4lvr7zjhbphibsyx51psv50gm07mbb0kj9058j6kc";
         };
       }
-      {
-        name = "geometry";
-        src = pkgs.fetchFromGitHub {
-          owner = "geometry-zsh";
-          repo = "geometry";
-          rev = "master";
-          sha256 = "02knbmcf8invkvz0g42xk3dlk4lqffk43bsmi8z4n01508jqkd8g";
-        };
-      }
+#    {
+#         name = "geometry";
+#         src = pkgs.fetchFromGitHub {
+#           owner = "geometry-zsh";
+#           repo = "geometry";
+#           rev = "fdff57bde4afb43beda73a14dea7738961f99bc2";
+#           sha256 = "D7WJJQIlAEs+ilWvQaZzmJJJ25hdkAf+nttG5Fhddgo=";
+#         };
+#       }
     ];
     oh-my-zsh = {
       enable = true;
-      theme = "geometry";
+      theme = "af-magic";
       plugins = [
-        "docker"
-        "kubectl"
-        "git"
-        "fzf"
-        "flutter"
-        "direnv"
-        "pip"
-        "poetry"
-        "python"
-        "rust"
-        "poetry-env"
-        "starship"
-        "sudo"
-        "zoxide"
-        "nmap"
+         "docker"
+         "kubectl"
+         "git"
+         "fzf"
+         "flutter"
+         "direnv"
+         "pip"
+         "poetry"
+         "python"
+         "rust"
+         "poetry-env"
+         "starship"
+         "sudo"
+         "zoxide"
+         "nmap"
       ];
     };
     shellAliases = {
@@ -714,14 +750,33 @@
       gc = "git commit -m";
       gp = "git push origin master";
     };
+    initExtra = ''
+#       # Disable Git checks in non-Git directories for geometry
+#       GEOMETRY_PROMPT_PLUGINS=(exec_time git)
+
+      # History options
+      HISTSIZE="10000"
+      SAVEHIST="10000"
+      HISTFILE="$HOME/.zsh_history"
+      mkdir -p "$(dirname "$HISTFILE")"
+
+      setopt HIST_FCNTL_LOCK
+      unsetopt APPEND_HISTORY
+      setopt HIST_IGNORE_DUPS
+      unsetopt HIST_IGNORE_ALL_DUPS
+      setopt HIST_IGNORE_SPACE
+      unsetopt HIST_EXPIRE_DUPS_FIRST
+      setopt SHARE_HISTORY
+      unsetopt EXTENDED_HISTORY
+    '';
   };
 
   programs.oh-my-posh = {
     enable = true;
     enableBashIntegration = true;
     enableFishIntegration = false;
-    enableZshIntegration = false;
-    useTheme = "emodipt-extend";
+    enableZshIntegration = true;
+    useTheme = "space";
   };
   
   # This value determines the home manager release that your configuration
