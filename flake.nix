@@ -19,10 +19,10 @@
 
   outputs = { nixpkgs, home-manager, nix-index-database, nix-colors, stylix, nvf, nur, nixvim, ... }@inputs: {
 
-    # packages."x86_64-linux".default =
+    #  packages."x86_64-linux".default =
     #   (nvf.lib.neovimConfiguration {
     #     pkgs = nixpkgs.legacyPackages."x86_64-linux";
-    #     modules = [ ./nvf-configuration.nix ];
+    #     modules = [ ./nvf-configuration.nix ]; 
     #   }).neovim;
 
     nixosConfigurations = {
@@ -35,6 +35,7 @@
           nix-index-database.nixosModules.nix-index
           home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
+          nvf.nixosModules.default
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
