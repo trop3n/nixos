@@ -186,13 +186,6 @@
     devbox
     virtualbox
     kubectl
-    qemu
-    virt-manager
-    libvirt
-    virt-viewer
-    bridge-utils
-    dnsmasq
-    ebtables
 
     # audio & video
     supercollider
