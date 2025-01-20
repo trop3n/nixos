@@ -299,10 +299,6 @@
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [
       kdePackages.kate
-      wireshark
-      efibootmgr
-      os-prober
-      vscodium
     #  thunderbird
     ];
 
@@ -322,6 +318,12 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     adwaita-icon-theme
+    wireshark
+    efibootmgr
+    os-prober
+    vscodium
+    postgresql_17
+    metasploit
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -333,6 +335,12 @@
   # };
 
   # List services that you want to enable:
+
+  # Postgresql
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_17;
+  };
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
