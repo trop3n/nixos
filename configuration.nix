@@ -120,6 +120,8 @@
     };
   };
 
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModprobeConfig = "options kvm_intel nested=1";
 
   # Perform garbage collection weelky to maintain low disk usage
   nix.gc = {
@@ -131,8 +133,48 @@
   # libvirt
   virtualisation.libvirtd = {
     enable = true;
-    package = pkgs.qemu_kvm; # Use the QEMU package with KVM support
+    qemu = { 
+      package = pkgs.qemu_kvm;
+      runAsRoot = true;
+      swtpm.enable = true;
+      ovmf = {
+        enable = true;
+        packages = [ pkgs.OVMF.fd ];
+      };
+    };
   };
+
+  # Create default network via systemd service
+  systemd.services.libvirt-default-network = let
+    networkXml = pkgs.writeText "default-network.xml" ''
+      <network>
+        <name>default</name>
+        <forward mode='nat'/>
+        <bridge name='virbr0' stp='on' delay='0'/>
+        <ip address='192.168.122.1' netmask='255.255.255.0'>
+          <dhcp>
+            <range start='192.168.122.2' end='192.168.122.254'/>
+          </dhcp>
+        </ip>
+      </network>
+    '';
+  in {
+    wantedBy = [ "multi-user.target" ];
+    after = [ "libvirtd.service" ];
+    requires = [ "libvirtd.service" ];
+    path = [ pkgs.libvirt ];
+    script = ''
+      # Create network if it doesn't exist
+      if ! virsh net-info default >/dev/null 2>&1; then
+        virsh net-define ${networkXml}
+      fi
+      
+      # Ensure autostart and activation
+      virsh net-autostart default || true
+      virsh net-start default || true
+    '';
+  }; 
+
 
   # Optimize Storage
   # You can optimize the store manually via:
@@ -151,12 +193,22 @@
   # networking.extraHosts = ''
   # ''
 
+  # networking.bridges.br0.interfaces = [ "enp6s0" ];
+  # networking.interfaces.br0.useDHCP = true;
+
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
   networking.networkmanager.enable = true;
+
+  # Open ports in the firewall.
+  networking.firewall.trustedInterfaces = [ "vibr0" ];
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
 
   # Set your time zone.
   time.timeZone = "America/Chicago";
@@ -296,7 +348,7 @@
   users.users.jason = {
     isNormalUser = true;
     description = "jason";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "libvirtd" "kvm" ];
     packages = with pkgs; [
       kdePackages.kate
     #  thunderbird
@@ -324,6 +376,15 @@
     vscodium
     postgresql_17
     metasploit
+    qemu
+    virt-manager
+    libvirt
+    virt-viewer
+    bridge-utils
+    dnsmasq
+    ebtables
+    iptables
+    OVMF.fd
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -347,12 +408,6 @@
 
   # Enable Docker
   virtualisation.docker.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
