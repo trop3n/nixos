@@ -60,18 +60,16 @@
     cursor.size = 24;
   };
   stylix.targets = {
-    gtk.enable = true;
-    # qt.enable = true;
-    chromium.enable = true;
-    fish.enable = true;
     grub.enable = true;
     nixos-icons.enable = true;
-    nixvim.enable = true;
-    # nixvim.plugin = "base16-nvim";
+    chromium.enable = true;
+    gtk.enable = true;
+    fish.enable = true;
+  #  nixvim.enable = true;
   };
 
   # Set the default editor to vim
-  environment.variables.EDITOR = "nvim";
+  environment.variables.EDITOR = "hx";
 
   fonts.fontDir.enable = true;
 

@@ -4,38 +4,340 @@
   imports = [
     inputs.nixvim.homeManagerModules.nixvim
     # inputs.nvf.homeManagerModules.default
-    # inputs.stylix.homeManagerModules.stylix
   ];
 
   # Enable nixvim
   programs.nixvim = {
     enable = true;
     colorscheme = "base16-default-dark";
+    viAlias = true;
+    vimAlias = true;
+    #extraConfigLua = builtins.readFile ./nvim/init.lua;
+    extraConfigLua = ''
+      vim.env.PATH = vim.env.PATH .. ':' .. '${pkgs.ripgrep}/bin' .. ':' .. '${pkgs.fd}/bin'
+      vim.g.copilot_no_tab_map = true
+      vim.g.copilot_assume_mapped = true
+      vim.g.copilot_filetypes = { ["*"] = true }
+      require("copilot_cmp").setup()
+    '';
 
-    # Basic settings
+    globals = {
+      mapleader = " ";
+      maplocalleader = ",";
+    };
 
+    opts = {
+      number = true;
+      relativenumber = true;
+      tabstop = 2;
+      shiftwidth = 2;
+      expandtab = true;
+      termguicolors = true;    
+    };
+
+    plugins = {
+      web-devicons.enable = true;
+      telescope.enable = true;
+      harpoon.enable = true;
+      which-key.enable = true;
+      persistence.enable = true;
+      comment.enable = true;
+    #  fidget.enable = true;
+      nvim-autopairs = {
+        enable = true;
+      };
+
+      # Dashboard configuration
+      alpha = {
+        enable = true;
+        layout = [
+          # Header
+          {
+            type = "text";
+            val = [
+              "                                                                     "
+              "       ████ ██████           █████      ██                     "
+              "      ███████████             █████                             "
+              "      █████████ ███████████████████ ███   ███████████   "
+              "     █████████  ███    █████████████ █████ ██████████████   "
+              "    █████████ ██████████ █████████ █████ █████ ████ █████   "
+              "  ███████████ ███    ███ █████████ █████ █████ ████ █████  "
+              " ██████  █████████████████████ ████ ████ █████ ████ ██████ "
+              "                                                                       "
+              "                               Jason Kimm                              "
+              "                                                                       "
+            ];
+            opts = {
+              position = "center";
+              hl = "AlphaHeader";
+              shrink_margin = false;
+            };
+          }
+    
+          # Buttons group (centered)
+          {
+            type = "group";
+            opts.spacing = 2;
+            val = [
+              {
+                type = "button";
+                val = "  Find File";
+                on_press.__raw = "function() require('telescope.builtin').find_files() end";
+                opts = {
+                  hl = "Number";
+                  keymap = [ "n" "<leader>ff" "<cmd>Telescope find_files<cr>" { desc = "Find File"; } ];
+                  spacing = 2;
+                  position = "center";
+                };
+              }
+              {
+                type = "button";
+                val = "  Find Text";
+                on_press.__raw = "function() require('telescope.builtin').live_grep() end";
+                opts = {
+                  hl = "String";
+                  keymap = [ "n" "<leader>fg" "<cmd>Telescope live_grep<cr>" { desc = "Live Grep"; } ];
+                  spacing = 2;
+                  position = "center";
+                };
+              }
+              {
+                type = "button";
+                val = "  Restore Session";
+                on_press.__raw = "function() require('persistence').load() end";
+                opts = {
+                  hl = "Constant";
+                  keymap = [ "n" "<leader>fs" "<cmd>lua require('persistence').load()<cr>" { desc = "Restore Session"; } ];
+                  spacing = 2;
+                  position = "center";
+                };
+              }
+              {
+                type = "button";
+                val = "  Config";
+                on_press.__raw = "function() require('oil').open(vim.fn.stdpath('config')) end";
+                opts = {
+                  hl = "Function";
+                  keymap = [ "n" "<leader>fc" "<cmd>Oil ~/.config/nixpkgs<cr>" { desc = "Open Config"; } ];
+                  spacing = 2;
+                  position = "center";
+                };
+              }
+              {
+                type = "button";
+                val = "  Quit";
+                on_press.__raw = "function() vim.cmd.quit() end";
+                opts = {
+                  hl = "Error";
+                  keymap = [ "n" "<leader>qq" "<cmd>qa<cr>" { desc = "Quit Neovim"; } ];
+                  spacing = 2;
+                  position = "center";
+                };
+              }
+            ];
+          }
+        ];
+      };
+      lualine = {
+        enable = true;
+        settings = {
+          options = {
+            theme = "monokai-pro";
+            section_separators = { left = ""; right = ""; };
+            component_separators = { left = ""; right = ""; };
+          };
+        };
+      };   
+      # lsp = {
+      #   enable = true;
+      #   servers = {
+      #     rust-analyzer = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #       settings.check.command = "clippy";
+      #     };
+      #     nil = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #     };
+      #     pyright = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #     };
+      #     elixirls = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #       cmd = [ "${pkgs.elixir_ls}/bin/elixir-ls" ];
+      #     };
+      #     # Nim (requires nixpkgs-unstable or overlay)
+      #     nimls = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #     };
+      #     gleam = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #     };
+      #     tsserver = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #     };
+      #     clangd = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #       settings.cmd = [ "clangd" "--background-index" "--clang-tidy" ];
+      #     };
+      #     solargraph = {
+      #       enable = true;
+      #       installLanguageServer = true;
+      #     };
+      #   };
+      #   keymaps = {
+      #     silent = true;
+      #     lspBuf = {
+      #       gd = "definition";
+      #       gr = "references";
+      #       gi = "implementation";
+      #       K = "hover";
+      #       "<leader>rn" = "rename";
+      #       "<leader>ca" = "code_action";
+      #     };
+      #   };
+      # };
+      # conform = {
+      #   enable = true;
+      #   formatters = {
+      #     alejandra.command = "${pkgs.alejandra}/bin/alejandra";
+      #     black.command = "${pkgs.black}/bin/black";
+      #     prettier.command = "${pkgs.nodePackages.prettier}/bin/prettier";
+      #   #  standardrb.command = "${pkgs.rubyPackages.standardrb}/bin/standardrb";
+      #   };
+
+      # # Format on save (Nix camelCase → Lua snake_case)
+      #   format_on_save = {
+      #     timeoutMs = 5000;
+      #     lspFallback = true;
+      #     async = false;
+      #   };
+
+      # # Filetype mappings
+      #   formattersByFt = {
+      #     nix = [ "alejandra" ];
+      #     python = [ "black" ];
+      #     javascript = [ "prettier" ];
+      #     typescript = [ "prettier" ];
+      #     html = [ "prettier" ];
+      #     css = [ "prettier" ];
+      #     json = [ "prettier" ];
+      #     ruby = [ "standardrb" ];
+      #   };
+      # };
+      cmp = {
+        enable = true;
+        settings = {
+          sources = [
+            { name = "nvim_lsp"; }
+            { name = "path"; }
+            { name = "buffer"; }
+            { name = "copilot"; }
+          ];
+          mapping = {
+            "<C-Space>" = "cmp.mapping.complete()";
+            "<CR>" = "cmp.mapping.confirm({ select = true })";
+            "<Tab>" = "cmp.mapping.select_next_item()";
+            "<S-Tab>" = "cmp.mapping.select_prev_item()";           
+          };
+        };
+      };
+
+      # indent-blankline = {
+      #   enable = true;
+      #   settings = {
+      #     char = "▏";
+      #     scope = {
+      #       showStart = false;
+      #       showEnd = false;
+      #     };
+      #   };
+      # };
+    };
+    extraPackages = with pkgs; [
+      ripgrep
+      fd
+      git
+      zoxide
+    ];
+    extraPlugins = with pkgs.vimPlugins; [
+      copilot-vim
+      copilot-cmp
+    ];
+    keymaps = [
+      {
+        mode = "n";
+        key = "<leader>ff";
+        action = "<cmd>Telescope find_files<cr>";
+        options.desc = "Find File";
+      }
+      {
+        mode = "n";
+        key = "<leader>fb";
+        action = "<cmd>Telescope buffers<cr>";
+        options.desc = "Find Buffers";
+      }
+      {
+        mode = "n";
+        key = "<leader>fg";
+        action = "<cmd>Telescope live_grep<cr>";
+        options.desc = "Live Grep";
+      }
+      {
+        mode = "n";
+        key = "<leader>fh";
+        action = "<cmd>Telescope help_tags<cr>";
+        options.desc = "Help Tags";
+      }
+      {
+        mode = "n";
+        key = "<leader>e";
+        action = "<cmd>Oil<cr>";
+        options.desc = "File Explorer";
+      }
+      {
+        mode = "n";
+        key = "<leader>fs";
+        action = "<cmd>lua require('persistence').load()<cr>";
+        options.desc = "Restore Session";
+      }
+      {
+        mode = "n";
+        key = "<leader>q";
+        action = "<cmd>q<CR>";
+        options.desc = "Quit";
+      }  
+    ];
   };
 
-  # nvf configuration
-  # programs.nvf = {
-  #   enable = true;
-  # };
-  
   # stylix home-manager
-#   stylix = {
-#     iconTheme = {
-#       enable = true;
-#       name = "Adwaita";
-#       package = pkgs.adwaita-icon-theme;
-#     };
-#   };
-
+  stylix = {
+    enable = true;
+    targets = {
+      helix.enable = true;
+      gtk.enable = true;
+      fish.enable = true;
+      fzf.enable = true;
+      kde.enable = true;
+      lazygit.enable = true;
+      tmux.enable = true;
+      zellij.enable = true;
+    };
+  };
+  
   home = {
     username = "jason";
     homeDirectory = "/home/jason";
     sessionVariables = {
-      EDITOR = "nvim";
-      VISUAL = "nvim";
+      EDITOR = "hx";
+      VISUAL = "hx";
       TERMINAL = "alacritty";
       LANG = "en_US.UTF-8";
       FZF_CTRL_T_OPTS = "--preview 'bat -n --color=always --theme='Catppuccin Mocha' --line-range :500 {}'";
@@ -81,6 +383,7 @@
     libgcc
     clang
     gdb
+    lldb
 
     # web browsers
     firefox-devedition
@@ -109,6 +412,29 @@
     gleam
     scala
     lua
+    nim
+
+    # language servers
+    nodePackages.vscode-langservers-extracted # html, css, json, eslint
+    nodePackages.yaml-language-server
+    nil # nix
+    elixir_ls
+    metals
+    crystalline
+    solargraph
+    nodePackages.typescript-language-server
+    python3Packages.python-lsp-server
+    clang-tools
+    solargraph
+
+    # formatters and linters
+    alejandra
+    deadnix
+    nodePackages.prettier
+    shellcheck
+    shfmt
+    statix
+    black
 
     # dev environments
     android-studio
@@ -133,25 +459,6 @@
     zsh-autosuggestions
     zsh-syntax-highlighting
     zsh-autocomplete
-
-    # language servers
-    nodePackages.vscode-langservers-extracted # html, css, json, eslint
-    nodePackages.yaml-language-server
-    nil # nix
-    elixir_ls
-    metals
-    crystalline
-    solargraph
-    nodePackages.typescript-language-server
-    python3Packages.python-lsp-server
-
-    # formatters and linters
-    alejandra
-    deadnix
-    nodePackages.prettier
-    shellcheck
-    shfmt
-    statix
 
     # security tools
     burpsuite
@@ -180,6 +487,7 @@
     dirb
     responder
     wpscan
+    tcpdump
 
     # containers
     docker_27
@@ -301,6 +609,7 @@
     lazygit
     lf
     superfile
+    navi
 
     # networking tools
     mtr # network diagnostic tool
@@ -332,6 +641,8 @@
     cgdb
     ffmpeg_7-full
     cava
+    figlet
+    lolcat
 
     # nix related
     # it provides the command 'nom' works just like 'nix'
@@ -437,7 +748,6 @@
   programs.helix = {
     enable = true;
     settings = {
-      theme = lib.mkForce "monokai_pro_spectrum";
       editor.cursor-shape = {
         normal = "block";
         insert = "bar";
@@ -449,12 +759,12 @@
       auto-format = true;
       formatter.command = lib.getExe pkgs.nixfmt-rfc-style;
     }];
-    themes = {
-      monokai_pro_spectrum = {
-        "inherits" = "monokai_pro";
-        "ui.background" = { };
-      };
-    };
+    # themes = {
+    #   monokai_pro_spectrum = {
+    #     "inherits" = "monokai_pro";
+    #     "ui.background" = { };
+    #   };
+    # };
   };
 
   # zed
@@ -578,7 +888,7 @@
     settings = {
       default_layout = "compact";
       default_shell = "fish";
-      # theme = "tokyo-night-storm";
+    #  theme = "tokyo-night-storm";
     };
   };
 
@@ -599,8 +909,8 @@
       directory.truncation_length = 8;
       hostname.style = "bold cyan";
       username = {
-        style_user = "bright-green bold";
-        style_root = "bright-blue bold";
+        style_user = "green bold";
+        style_root = "blue bold";
       };
     };
   };
